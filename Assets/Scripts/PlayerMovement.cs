@@ -2,10 +2,16 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 30f;
+    [SerializeField] private float moveSpeed = 150f;
+    [SerializeField] private float jumpForce = 630f;
+
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.2f;
+    [SerializeField] private LayerMask groundLayer;
 
     private Rigidbody2D rb;
     private float horizontalInput;
+    private bool jumpRequested;
 
 
     private void Awake()
@@ -17,10 +23,26 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        if(Input.GetButtonDown("Jump") && IsGrounded())
+        {
+            jumpRequested = true;
+        }
     }
 
     private void FixedUpdate()
     {
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+        if (jumpRequested)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            jumpRequested = false;
+        }
+    }
+
+    private bool IsGrounded()
+    {
+        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
     }
 }
