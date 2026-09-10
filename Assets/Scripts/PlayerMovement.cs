@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 150f;
-    [SerializeField] private float jumpForce = 630f;
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float jumpForce = 10f;
 
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.2f;
@@ -12,7 +12,6 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private float horizontalInput;
     private bool jumpRequested;
-
 
     private void Awake()
     {
@@ -24,7 +23,7 @@ public class PlayerMovement : MonoBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        if(Input.GetButtonDown("Jump") && IsGrounded())
+        if (Input.GetButtonDown("Jump") && IsGrounded())
         {
             jumpRequested = true;
         }
@@ -32,17 +31,21 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Apply horizontal movement
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+
+        // Apply jump as an impulse force
         if (jumpRequested)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             jumpRequested = false;
         }
     }
 
     private bool IsGrounded()
     {
+        if (groundCheck == null) return false;
         return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-
     }
 }
+
